@@ -548,7 +548,11 @@ function downloadFileWithProgressAndHash(fileUrl, filePath, onProgress, options 
 				return;
 			}
 
-			const totalSize = parseInt(response.headers['content-length'], 10);
+		const totalSize = parseInt(response.headers['content-length'], 10);
+		if (isNaN(totalSize) || totalSize < 0) {
+			// Handle missing or invalid content-length header
+			console.warn('Invalid or missing content-length header');
+		}
 			let downloadedSize = 0;
 
 			response.on('data', (chunk) => {
