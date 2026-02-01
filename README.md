@@ -59,6 +59,25 @@ Local AI assistant integrated using **Ollama**.
 * **MinGW-w64** or [**Git for Windows**](https://git-scm.com/downloads/win)
 * **Ollama** for AI Assistant [**ReVens AI Assistant Setup**](AI.md)
 
+## 📦 Installation
+
+```sh
+git clone https://github.com/Jakiboy/ReVens .
+bash init.sh
+```
+
+## ▶️ Run (Development)
+
+```sh
+bash run.sh
+```
+
+## 🧱 Build (Production)
+
+```sh
+bash build.sh
+```
+
 ## 🔧 Build
 
 ```sh
@@ -76,9 +95,25 @@ bash build.sh
 ./scripts/generate.cmd
 ```
 
+Linux/macOS validation:
+
+```sh
+python scripts/test_items.py --no-path --no-lookup --no-url --no-download --no-version
+```
+
 ## 🔧 Download
 
 * Download latest ReVens from: [Releases](https://github.com/Jakiboy/ReVens/releases).
+
+## 🧩 Dependency Map (High-Level)
+
+* **Electron main process**: `src/main.js`, `src/main/helper.js` for native dialogs, downloads, and app lifecycle.
+* **React UI**: `src/app` components with `webpack` build pipeline.
+* **Configs/Data**: `src/config/*.json` for app metadata, packages, and UI strings.
+
+## 🤝 Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting changes.
 
 ## 🔧 TODO
 
@@ -198,6 +233,7 @@ Analyze portable-executables and related files (EXE, DLL, OCX, SYS).
 * **SCANiT** - *PE scanner.*
 * **Sleuth Kit** - *Sleuth Kit.*
 * **TrID** - *File Identifier (CLI).*
+
 * **TrIDNet** - *Binary Signature Identifier.*
 * **Enigma Info** - *Enigma binary analysis tool.*
 * **Corso Scanner** - *Vulnerability/code scanner.*
@@ -1548,3 +1584,7 @@ Helper tools and miscellaneous content.
 ### ⭐ Support:
 
 Skip the coffee! If you like the project, a **star** would mean a lot.
+
+---
+
+**Last enhanced by Codex:** 2026-02-01 02:36 UTC

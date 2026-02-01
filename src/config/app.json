@@ -21,6 +21,7 @@
 		"host": "https://revens.jihadsinnaour.com/download",
 		"token": "e4U8fXWuFeOvEA5hOnd6JHkK7doWfZiQ",
 		"pswd": "j0LfzCIvJy",
+		"timeoutMs": 600000,
 		"parts": [
 			{
 				"name": "Analyzing.zip",

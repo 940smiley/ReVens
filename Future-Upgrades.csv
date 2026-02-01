@@ -1,0 +1,7 @@
+Component/Dependency,Candidate versions,Compatibility notes,Breaking-change risk,Estimated complexity (S/M/L),Mitigation strategies,Codex notes,Risk flag (Low/Med/High)
+Electron,30.x / 31.x,Verify native module compatibility and update build scripts,High,L,Stage upgrade in branch and run packaging pipeline,Electron runtime upgrade needs full smoke test,High
+Node.js,24.x LTS,Align CI and build scripts with supported Electron Node,Med,M,Pin node in CI and update init/run docs,Use nvm or .nvmrc if adopted,Med
+React,19.x,Review breaking changes for concurrent features and library compatibility,Med,M,Upgrade mdb-react-ui-kit first,Renderer code is simple but needs UI QA,Med
+Webpack,5.9x,Confirm plugin compatibility and production build output,Low,S,Lock version and verify build output,Minimal change expected,Low
+Axios,1.7+,Review defaults and retry/timeouts for downloads,Low,S,Update and run smoke tests,Potentially adopt retries for resiliency,Low
+MDB React UI Kit,8.x,Check styling changes and component API updates,Med,M,Pin and update UI components incrementally,Requires visual regression checks,Med
