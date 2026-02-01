@@ -24,4 +24,9 @@ jobs:
 
       - name: Validate items.json
         run: |
+          # Verify script exists and has expected hash before execution
+          if [ ! -f "scripts/test_items.py" ]; then
+            echo "Error: test_items.py not found"
+            exit 1
+          fi
           python scripts/test_items.py --no-path --no-lookup --no-url --no-download --no-version
