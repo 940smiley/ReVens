@@ -18,9 +18,9 @@
 	},
 	"baseDir": false,
 	"items": {
-		"host": "https://revens.jihadsinnaour.com/download",
-		"token": "e4U8fXWuFeOvEA5hOnd6JHkK7doWfZiQ",
-		"pswd": "j0LfzCIvJy",
+		"host": "",
+		"token": "${DOWNLOAD_TOKEN}",
+		"pswd": "${DOWNLOAD_PASSWORD}",
 		"timeoutMs": 600000,
 		"parts": [
 			{
