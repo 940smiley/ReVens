@@ -361,7 +361,30 @@ async function startDownload(launcher) {
 
 		try {
 			// Download with hash calculation if hash is expected
-			const actualHash = await downloadFile(fileUrl, filePath, !!expectedHash);
+			const actualHash = await downloadFileWithProgressAndHash(
+				fileUrl,
+				filePath,
+				(progressData) => {
+					const fileProgress = Number.isFinite(progressData.progress) ? progressData.progress : 0;
+					const overallProgress = Math.min(
+						99,
+						Math.round(((i + fileProgress) / parts.length) * 100)
+					);
+					const sizeInfo = progressData.totalSize
+						? `${formatBytes(progressData.downloadedSize)} of ${formatBytes(progressData.totalSize)}`
+						: `${formatBytes(progressData.downloadedSize)}`;
+
+					sendDownloadProgress(launcher, {
+						progress: overallProgress,
+						currentFile: fileName,
+						status: `Downloading ${i + 1}/${parts.length}... (${sizeInfo})`
+					});
+				},
+				{
+					calculateHash: !!expectedHash,
+					timeoutMs: config?.items?.timeoutMs || 600000
+				}
+			);
 
 			if (downloadAborted) {
 				// Clean up partial download
@@ -489,6 +512,100 @@ function downloadFile(fileUrl, filePath, calculateHash = false) {
 			reject(error);
 		});
 	});
+}
+
+/**
+ * Download a file with progress tracking and optional hash calculation.
+ */
+function downloadFileWithProgressAndHash(fileUrl, filePath, onProgress, options = {}) {
+	const {
+		calculateHash = false,
+		timeoutMs = 600000
+	} = options;
+
+	return new Promise((resolve, reject) => {
+		const protocol = fileUrl.startsWith('https') ? https : http;
+		const file = fs.createWriteStream(filePath);
+		const hash = calculateHash ? crypto.createHash('md5') : null;
+
+		const cleanup = () => {
+			file.close();
+			fs.unlink(filePath, () => { });
+		};
+
+		const request = protocol.get(fileUrl, (response) => {
+			if ([301, 302, 307, 308].includes(response.statusCode)) {
+				cleanup();
+				downloadFileWithProgressAndHash(response.headers.location, filePath, onProgress, options)
+					.then(resolve)
+					.catch(reject);
+				return;
+			}
+
+			if (response.statusCode !== 200) {
+				cleanup();
+				reject(new Error(`Failed to download: ${response.statusCode}`));
+				return;
+			}
+
+			const totalSize = parseInt(response.headers['content-length'], 10);
+			let downloadedSize = 0;
+
+			response.on('data', (chunk) => {
+				if (downloadAborted) {
+					response.destroy();
+					cleanup();
+					reject(new Error('Download aborted'));
+					return;
+				}
+
+				downloadedSize += chunk.length;
+				if (hash) {
+					hash.update(chunk);
+				}
+
+				if (onProgress) {
+					const progress = totalSize ? downloadedSize / totalSize : null;
+					onProgress({ progress, downloadedSize, totalSize });
+				}
+			});
+
+			response.pipe(file);
+
+			file.on('finish', () => {
+				file.close();
+				if (downloadAborted) {
+					fs.unlink(filePath, () => { });
+					reject(new Error('Download aborted'));
+				} else {
+					const md5Hash = hash ? hash.digest('hex') : null;
+					resolve(md5Hash);
+				}
+			});
+
+			file.on('error', (error) => {
+				cleanup();
+				reject(error);
+			});
+		});
+
+		request.setTimeout(timeoutMs, () => {
+			request.destroy(new Error('Download timeout'));
+		});
+
+		request.on('error', (error) => {
+			cleanup();
+			reject(error);
+		});
+	});
+}
+
+function formatBytes(bytes) {
+	if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+	const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+	const index = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+	const value = bytes / Math.pow(1024, index);
+	return `${value.toFixed(value >= 10 || index === 0 ? 0 : 1)} ${units[index]}`;
 }
 
 /**

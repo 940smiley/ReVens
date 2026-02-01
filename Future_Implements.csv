@@ -1,0 +1,6 @@
+Feature name,Feasibility (0–100),Est. dev time,Expected impact,Priority (P0/P1/P2),Recommended branch name (codex/<feature>),Notes / dependencies
+Download retry/backoff for packages,85,2-3 days,Improves reliability on flaky networks,P1,codex/download-retry,Would extend helper download logic with exponential backoff
+Configurable download mirror list,70,3-4 days,Reduces single-host dependency,P1,codex/download-mirrors,Requires new config schema and UI toggle
+Package download progress UI per file,90,1-2 days,Better feedback for large archives,P0,codex/package-progress,Renderer already accepts progress; ensure data shown
+Automated package integrity report,60,3-5 days,Trust/verification improvements,P2,codex/integrity-report,Would log checksums to a report file
+AI model chooser in settings,65,4-5 days,Improves AI usability,P2,codex/ai-model-selector,Requires settings UI and backend config update
