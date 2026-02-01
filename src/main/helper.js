@@ -534,13 +534,29 @@ function downloadFileWithProgressAndHash(fileUrl, filePath, onProgress, options 
 		};
 
 		const request = protocol.get(fileUrl, (response) => {
-			if ([301, 302, 307, 308].includes(response.statusCode)) {
+		if ([301, 302, 307, 308].includes(response.statusCode)) {
+			// Validate redirect URL and limit redirect count
+			const redirectUrl = response.headers.location;
+			if (!redirectUrl || (!redirectUrl.startsWith('https://') && !redirectUrl.startsWith('http://'))) {
 				cleanup();
-				downloadFileWithProgressAndHash(response.headers.location, filePath, onProgress, options)
-					.then(resolve)
-					.catch(reject);
+				reject(new Error('Invalid redirect URL'));
 				return;
 			}
+			
+			// Add redirect count tracking to options
+			const redirectCount = (options.redirectCount || 0) + 1;
+			if (redirectCount > 5) {
+				cleanup();
+				reject(new Error('Too many redirects'));
+				return;
+			}
+			
+			cleanup();
+			downloadFileWithProgressAndHash(redirectUrl, filePath, onProgress, { ...options, redirectCount })
+				.then(resolve)
+				.catch(reject);
+			return;
+		}
 
 			if (response.statusCode !== 200) {
 				cleanup();
