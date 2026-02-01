@@ -564,10 +564,10 @@ function downloadFileWithProgressAndHash(fileUrl, filePath, onProgress, options 
 					hash.update(chunk);
 				}
 
-				if (onProgress) {
-					const progress = totalSize ? downloadedSize / totalSize : null;
-					onProgress({ progress, downloadedSize, totalSize });
-				}
+			if (onProgress) {
+				const progress = totalSize && totalSize > 0 ? downloadedSize / totalSize : null;
+				onProgress({ progress, downloadedSize, totalSize });
+			}
 			});
 
 			response.pipe(file);
